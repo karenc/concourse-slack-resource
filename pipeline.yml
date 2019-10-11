@@ -1,0 +1,35 @@
+---
+resource_types:
+  - name: slack
+    type: docker-image
+    source:
+      repository: karenc/concourse-slack-resource
+
+resources:
+  - name: bot
+    type: slack
+    source:
+      user_access_token: ((slack-user-access-token))
+      bot_access_token: ((slack-bot-access-token))
+      bot_user_id: ((slack-bot-user-id))
+      regexp: '<@((slack-bot-user-id))> (.*)'
+    check_every: 10s
+
+  - name: bot-write
+    type: slack
+    source:
+      user_access_token: ((slack-user-access-token))
+      bot_access_token: ((slack-user-bot-access-token))
+      bot_user_id: ((slack-bot-user-id))
+
+jobs:
+  - name: test
+    plan:
+      - get: bot
+        trigger: true
+        version: every
+
+      - put: bot-write
+        params:
+          text: '{{bot/message_text_0}} :tada:'
+          channel: '{{bot/channel}}'

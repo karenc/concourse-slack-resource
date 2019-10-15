@@ -81,13 +81,22 @@ class SlackResource:
     @staticmethod
     def in_(body, destination):
         log('calling SlackResource.in_')
-        message = call_api('conversations.history', {
-            'token': body['source']['user_access_token'],
-            'channel': body['version']['channel'],
-            'inclusive': True,
-            'oldest': body['version']['ts'],
-            'limit': 1,
-        })['messages'][0]
+
+        extra_args = {}
+        if 'thread_ts' in body['version']:
+            api = 'conversations.replies'
+            extra_args = {'ts': body['version']['thread_ts']}
+        else:
+            api = 'conversations.history'
+
+        message = call_api(api, dict(
+            token=body['source']['user_access_token'],
+            channel=body['version']['channel'],
+            inclusive=True,
+            oldest=body['version']['ts'],
+            limit=1,
+            **extra_args
+        ))['messages'][0]
         if body['source'].get('regexp'):
             m = re.search(body['source']['regexp'], message['text'])
             for i, group in enumerate(m.groups()):
@@ -129,10 +138,11 @@ class SlackResource:
         resp = call_api('chat.postMessage', dict(
             token=body['source']['bot_access_token'], **body['params']))
 
-        log(f'resp: {resp}')
+        version = {'channel': resp['channel'], 'ts': resp['ts']}
+        if resp.get('message', {}).get('thread_ts'):
+            version['thread_ts'] = resp['message']['thread_ts']
 
-        print(json.dumps({'version': {'channel': resp['channel'],
-                                      'ts': resp['ts']}}))
+        print(json.dumps({'version': version}))
 
 
 if __name__ == '__main__':

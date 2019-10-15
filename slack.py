@@ -100,6 +100,8 @@ class SlackResource:
             f.write(message.get('user', message.get('username')))
         with open(os.path.join(destination, 'channel'), 'w') as f:
             f.write(body['version']['channel'])
+        with open(os.path.join(destination, 'ts'), 'w') as f:
+            f.write(body['version']['ts'])
 
         print(json.dumps({'version': body['version']}))
 

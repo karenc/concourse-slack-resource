@@ -107,6 +107,7 @@ directory contains:
 2. `message_text_0`: `hey!`
 3. `channel`: `CDEF7890`
 4. `user`: `U0123456`
+5. `ts`: `1571329099.413700`
 
 Sending messages
 ----------------

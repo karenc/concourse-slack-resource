@@ -68,10 +68,9 @@ class SlackResource:
             for m in call_api('conversations.history', {
                         'token': source['user_access_token'],
                         'channel': channel['id'],
-                        'oldest': last_checked,
                     })['messages']:
-                if not source.get('regexp') or \
-                        re.search(source['regexp'], m['text']):
+                if m['ts'] > last_checked and (not source.get('regexp') or \
+                        re.search(source['regexp'], m['text'])):
                     messages.append({'channel': channel['id'], 'ts': m['ts']})
 
         if last_checked == 0:

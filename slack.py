@@ -57,7 +57,7 @@ class SlackResource:
             ', '.join([c['name'] for c in channels])))
 
         if not body.get('version'):
-            last_checked = 0
+            last_checked = '0'
         else:
             log(f'last checked: {body["version"]["ts"]}')
             last_checked = body['version']['ts']
@@ -73,7 +73,7 @@ class SlackResource:
                         re.search(source['regexp'], m['text'])):
                     messages.append({'channel': channel['id'], 'ts': m['ts']})
 
-        if last_checked == 0:
+        if last_checked == '0':
             messages = messages[:1]
         print(json.dumps(list(reversed(messages))))
 
